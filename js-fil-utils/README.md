@@ -1,3 +1,21 @@
+
+# In browser commp
+
+run `npm i`
+run `npx webpack`
+run `npx http-server -c-1`
+
+go to http://127.0.0.1:8081/ to test commp calculation on your local file
+
+
+
+
+
+## Original readme below:
+
+
+
+
 # js-fil-utils (npm: `@rvagg/fil-utils`)
 
 Miscellaneous JavaScript Filecoin utilities implementing pieces of the Filecoin proofs based on the Rust implementations at https://github.com/filecoin-project/rust-fil-proofs/
