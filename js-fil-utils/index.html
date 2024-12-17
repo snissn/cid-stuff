@@ -60,10 +60,16 @@
       output.textContent = 'Calculating... Please wait.';
 
       try {
+        // Start the timer
+        const startTime = performance.now();
+
         // Calculate CommP
         const result = await commp(file);
-        console.log(result)
         const commpCid = await generateCommPCid(result.commp);
+
+        // Stop the timer
+        const endTime = performance.now();
+        const elapsedTime = ((endTime - startTime) / 1000).toFixed(2);
 
         // Display the results
         output.textContent = `
@@ -71,6 +77,7 @@ CommPCid: ${commpCid}
 Payload:             ${result.size.toLocaleString()} bytes
 Unpadded piece:      ${result.paddedSize.toLocaleString()} bytes
 Padded piece:        ${result.pieceSize.toLocaleString()} bytes
+Time taken:          ${elapsedTime} seconds
         `;
       } catch (err) {
         output.textContent = `Error during CommP calculation: ${err.message}`;
