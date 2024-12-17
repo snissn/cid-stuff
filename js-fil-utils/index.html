@@ -4,17 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CommP Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    pre {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
 </head>
 <body>
   <h1>CommP Calculator</h1>
   <input type="file" id="fileInput" />
   <button id="calcButton">Calculate CommP</button>
-  <pre id="output"></pre>
+  <pre id="output">Please select a file and click "Calculate CommP".</pre>
 
-  <script type="module" src="./dist/bundle.js"></script>
   <script type="module">
-    // Ensure the commp function is available from the bundled script
-    import commp from './dist/bundle.js';
+    import { commp, generateCommPCid } from './dist/bundle.js';
 
     const fileInput = document.getElementById('fileInput');
     const calcButton = document.getElementById('calcButton');
@@ -28,19 +57,24 @@
         return;
       }
 
-      output.textContent = 'Calculating...';
+      output.textContent = 'Calculating... Please wait.';
 
       try {
+        // Calculate CommP
         const result = await commp(file);
+        console.log(result)
+        const commpCid = await generateCommPCid(result.commp);
+
+        // Display the results
         output.textContent = `
-File: ${file.name}
-Size: ${result.size} bytes
-Padded Size: ${result.paddedSize} bytes
-Piece Size: ${result.pieceSize} bytes
-CommP: ${result.commp.toString('hex')}
+CommPCid: ${commpCid}
+Payload:             ${result.size.toLocaleString()} bytes
+Unpadded piece:      ${result.paddedSize.toLocaleString()} bytes
+Padded piece:        ${result.pieceSize.toLocaleString()} bytes
         `;
       } catch (err) {
-        output.textContent = `Error: ${err.message}`;
+        output.textContent = `Error during CommP calculation: ${err.message}`;
+        console.error(err);
       }
     });
   </script>
