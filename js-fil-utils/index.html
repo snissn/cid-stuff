@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CommP Calculator</title>
+</head>
+<body>
+  <h1>CommP Calculator</h1>
+  <input type="file" id="fileInput" />
+  <button id="calcButton">Calculate CommP</button>
+  <pre id="output"></pre>
+
+  <script type="module" src="./dist/bundle.js"></script>
+  <script type="module">
+    // Ensure the commp function is available from the bundled script
+    import commp from './dist/bundle.js';
+
+    const fileInput = document.getElementById('fileInput');
+    const calcButton = document.getElementById('calcButton');
+    const output = document.getElementById('output');
+
+    calcButton.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+
+      if (!file) {
+        output.textContent = 'Please select a file.';
+        return;
+      }
+
+      output.textContent = 'Calculating...';
+
+      try {
+        const result = await commp(file);
+        output.textContent = `
+File: ${file.name}
+Size: ${result.size} bytes
+Padded Size: ${result.paddedSize} bytes
+Piece Size: ${result.pieceSize} bytes
+CommP: ${result.commp.toString('hex')}
+        `;
+      } catch (err) {
+        output.textContent = `Error: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
+
+
