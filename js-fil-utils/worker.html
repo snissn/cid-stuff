@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CommP Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    pre {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>CommP Calculator</h1>
+  <input type="file" id="fileInput" />
+  <button id="calcButton">Calculate CommP</button>
+  <pre id="output">Please select a file and click "Calculate CommP".</pre>
+
+  <script type="module">
+    const fileInput = document.getElementById('fileInput');
+    const calcButton = document.getElementById('calcButton');
+    const output = document.getElementById('output');
+
+    // Initialize the Web Worker
+    const worker = new Worker('worker.js', { type: 'module' });
+
+    calcButton.addEventListener('click', () => {
+      const file = fileInput.files[0];
+
+      if (!file) {
+        output.textContent = 'Please select a file.';
+        return;
+      }
+
+      output.textContent = 'Calculating... Please wait.';
+
+      // Start the timer
+      const startTime = performance.now();
+
+      // Send the file to the Web Worker
+      worker.postMessage({ file });
+
+      // Listen for messages from the worker
+      worker.onmessage = (e) => {
+        const endTime = performance.now();
+        const elapsedTime = ((endTime - startTime) / 1000).toFixed(2);
+
+        if (e.data.error) {
+          output.textContent = `Error: ${e.data.error}`;
+          console.error(e.data.error);
+          return;
+        }
+
+        const { result } = e.data;
+        output.textContent = `
+CommPCid: ${result.commpCid}
+Payload:             ${result.size.toLocaleString()} bytes
+Unpadded piece:      ${result.paddedSize.toLocaleString()} bytes
+Padded piece:        ${result.pieceSize.toLocaleString()} bytes
+Time taken:          ${elapsedTime} seconds
+        `;
+      };
+    });
+  </script>
+</body>
+</html>
+
